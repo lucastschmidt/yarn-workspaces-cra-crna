@@ -24,10 +24,10 @@ module.exports = function getWorkspaces(from) {
   });
 
   const packages = getPackages(require(path.join(root, 'package.json')));
-  return flatten(
-    packages.map(name =>
-      // The trailing / ensures only dirs are picked up
-      glob.sync(path.join(root, `${name}/`))
-    )
-  );
+  const possibleWorkspaces = flatten(packages.map(name => glob.sync(path.join(root, name))));
+
+  return possibleWorkspaces.filter( possibleWorkspace => {
+    const pJSON = path.join(possibleWorkspace, 'package.json');
+    return fs.existsSync(pJSON);
+  });
 };
